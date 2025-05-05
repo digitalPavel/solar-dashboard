@@ -1,0 +1,47 @@
+version: '3.8'  # Compose file format version
+
+services:
+  # ----------------------------
+  # 1) TimescaleDB service
+  # ----------------------------
+  db:
+    image: timescale/timescaledb:latest-pg14  # Official TimescaleDB image based on PostgreSQL 14
+    environment:
+      POSTGRES_DB: solardb           # Name of the database to create
+      POSTGRES_USER: solaruser       # Username for the database
+      POSTGRES_PASSWORD: solarpwd    # Password for the database user
+    volumes:
+      - db_data:/var/lib/postgresql/data              # Persist database files in a Docker volume
+      - ./measurement_dump_04132025.sql:/docker-entrypoint-initdb.d/measurement_dump.sql:ro 
+        # On first start, import this SQL dump into the new database (read-only mount)
+    ports:
+      - '5432:5432'  # Map host port 5432 → container port 5432 for external access
+
+  # ----------------------------
+  # 2) .NET Core Backend API
+  # ----------------------------
+  backend:
+    build: ./solardash.Server  # Build the API image from the Dockerfile in solardash.Server/
+    depends_on:
+      - db   # Ensure the database is started before the backend
+    environment:
+      ConnectionStrings__DefaultConnection: >
+        Host=db;Port=5432;Database=solardb;Username=solaruser;Password=solarpwd
+        # Pass the connection string into the ASP.NET Core app
+    ports:
+      - '5000:8080'  # Expose container port 8080 (Kestrel) on host port 5000
+
+  # ----------------------------
+  # 3) Angular Frontend + Nginx
+  # ----------------------------
+  frontend:
+    build:
+      context: .                        # Build context is the repo root
+      dockerfile: solardash.client/Dockerfile  # Dockerfile for the Angular app
+    depends_on:
+      - backend  # Start frontend only after the backend is up
+    ports:
+      - '4200:80'  # Serve the app on host port 4200 → container port 80
+
+volumes:
+  db_data:  # Named volume to store PostgreSQL data persistently  

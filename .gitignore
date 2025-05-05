@@ -1,0 +1,17 @@
+# .NET artifacts
+**/bin/
+**/obj/
+**/*.user
+.vs/
+
+# Node/Angular
+node_modules/
+dist/
+.angular/
+
+# Docker overrides
+docker-compose.override.yml
+
+# OS files
+.DS_Store
+Thumbs.db

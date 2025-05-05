@@ -1,0 +1,18 @@
+<div class="kpi-chart-container">
+  <!-- Container for the KPI Chart -->
+  <h3>KPI Chart</h3>
+  
+  <!-- Display a loading message if chartData is not available -->
+  <div *ngIf="!chartData">Loading data…</div>
+
+  <!-- Wrapper to control the size of the chart -->
+  <div class="chart-wrapper">
+    <!-- Render the chart only if chartData is available -->
+    <canvas *ngIf="chartData"
+            baseChart
+            [data]="chartData"
+            [options]="chartOptions"
+            [type]="chartType">
+    </canvas>
+  </div>
+</div>
