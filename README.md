@@ -101,8 +101,3 @@ docker-compose up -d --build
   ng serve --open --proxy-config proxy.conf.json
   ```
 
----
-
-# License
-
-MIT ©&#x20;
