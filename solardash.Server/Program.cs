@@ -5,9 +5,9 @@ using solardash.Server;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Register SolarDbContext and configure PostgreSQL connection
-// This allows EF Core to connect to PostgreSQL using connection string from appsettings.json. Scope by default
-builder.Services.AddDbContext<SolarDbContext>(options =>
+// Register SolarDbContext with pooling and configure PostgreSQL connection
+// AddDbContextPool enables DbContext pooling which can improve performance
+builder.Services.AddDbContextPool<SolarDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Add support for minimal API endpoint discovery
